@@ -4,7 +4,13 @@ window_panes=
 killlast=
 mfact=
 
+getmfact() {
+  $HOME/.local/src/dwm.tmux/dwmtmux
+}
+
+
 newpane() {
+  mfact=$(getmfact)
   tmux \
     split-window -t :.0\; \
     swap-pane -s :.0 -t :.1\; \
@@ -13,6 +19,7 @@ newpane() {
 }
 
 newpanecurdir() {
+  mfact=$(getmfact)
   tmux \
     split-window -t :.0 -c "#{pane_current_path}"\; \
     swap-pane -s :.0 -t :.1\; \
@@ -22,9 +29,10 @@ newpanecurdir() {
 
 killpane() {
   if [ $window_panes -gt 1 ]; then
+    mfact=$(getmfact)
     tmux kill-pane -t :.\; \
          select-layout main-vertical\; \
-         resize-pane -t :.0 -x ${mfact}%
+           resize-pane -t :.0 -x ${mfact}%
   else
     if [ $killlast -ne 0 ]; then
       tmux kill-window
@@ -53,6 +61,7 @@ zoom() {
 }
 
 layouttile() {
+  mfact=$(getmfact)
   tmux select-layout main-vertical\; resize-pane -t :.0 -x ${mfact}%
 }
 
@@ -61,21 +70,23 @@ float() {
 }
 
 incmfact() {
-  fact=$((mfact + 5))
-  if [ $fact -le 95 ]; then
-    tmux \
-      setenv mfact $fact\; \
-      resize-pane -t :.0 -x ${fact}%
-  fi
+  # fact=$((mfact + 5))
+  # if [ $fact -le 95 ]; then
+  #   tmux \
+  #     setenv mfact $fact\; \
+  #     resize-pane -t :.0 -x ${fact}%
+  # fi
+  $HOME/.local/src/dwm.tmux/dwmtmux 3
 }
 
 decmfact() {
-  fact=$((mfact - 5))
-  if [ $fact -ge 5 ]; then
-    tmux \
-      setenv mfact $fact\; \
-      resize-pane -t :.0 -x ${fact}%
-  fi
+  $HOME/.local/src/dwm.tmux/dwmtmux -3
+  # fact=$((mfact - 5))
+  # if [ $fact -ge 5 ]; then
+  #   tmux \
+  #     setenv mfact $fact\; \
+  #     resize-pane -t :.0 -x ${fact}%
+  # fi
 }
 
 if [ $# -lt 1 ]; then
@@ -87,7 +98,7 @@ command=$1;shift
 set -- $(echo $(tmux display -p "#{window_panes}\n#{killlast}\n#{mfact}"))
 window_panes=$1
 killlast=$2
-mfact=$3
+# mfact=$3
 
 case $command in
   newpane) newpane;;

@@ -12,8 +12,7 @@ getmfact() {
 newpane() {
   mfact=$(getmfact)
   tmux \
-    split-window -t :.0\; \
-    swap-pane -s :.0 -t :.1\; \
+    split-window -t :.0 -c "#{pane_current_path}"\; \
     select-layout main-vertical\; \
     resize-pane -t :.0 -x ${mfact}%
 }

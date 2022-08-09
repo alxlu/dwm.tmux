@@ -1,6 +1,9 @@
-PREFIX=/usr/local
+PREFIX=~/.local
 BINDIR=${PREFIX}/bin
 LIBDIR=${PREFIX}/lib
+ARCH=$(uname -m)
+OS=$(uname -s | tr '[:upper:]' '[:lower:]')
+
 
 .PHONY: install bin lib
 
@@ -14,8 +17,10 @@ lib:
 
 bin:
 	cp bin/* ${BINDIR}/
+	cp dwmtmux-$OS-$ARCH ${BINDIR}/dwmtmux
 
 uninstall:
 	rm ${BINDIR}/dwm.tmux
+	rm ${BINDIR}/dwmtmux
 	rm ${LIBDIR}/dwm.tmux
 

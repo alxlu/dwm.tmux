@@ -5,7 +5,7 @@ killlast=
 mfact=
 
 getmfact() {
-  $HOME/.local/src/dwm.tmux/dwmtmux
+  dwmtmux
 }
 
 
@@ -69,23 +69,11 @@ float() {
 }
 
 incmfact() {
-  # fact=$((mfact + 5))
-  # if [ $fact -le 95 ]; then
-  #   tmux \
-  #     setenv mfact $fact\; \
-  #     resize-pane -t :.0 -x ${fact}%
-  # fi
-  $HOME/.local/src/dwm.tmux/dwmtmux 3
+  dwmtmux 3
 }
 
 decmfact() {
-  $HOME/.local/src/dwm.tmux/dwmtmux -3
-  # fact=$((mfact - 5))
-  # if [ $fact -ge 5 ]; then
-  #   tmux \
-  #     setenv mfact $fact\; \
-  #     resize-pane -t :.0 -x ${fact}%
-  # fi
+  dwmtmux -3
 }
 
 if [ $# -lt 1 ]; then

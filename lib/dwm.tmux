@@ -29,3 +29,14 @@ bind -n M-t layouttile
 bind -n M-Space float
 bind -n M-h decmfact
 bind -n M-l incmfact
+
+bind  n newpane
+bind  w newpanecurdir
+bind  c killpane
+bind  j nextpane
+bind  k prevpane
+bind  Enter zoom
+bind  t layouttile
+bind  Space float
+bind  h decmfact
+bind  l incmfact

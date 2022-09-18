@@ -26,3 +26,5 @@ do
     fi
 done
 
+mv dwmtmux-linux-arm64 dwmtmux-linux-aarch64
+mv dwmtmux-linux-amd64 dwmtmux-linux-x86_64

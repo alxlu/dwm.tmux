@@ -110,8 +110,9 @@ case $command in
     while [ "${step#0}" != "$step" ]; do step=${step#0}; done
     step=${step:-0}
     # Reject oversized integers before passing them to shell arithmetic.
-    [ "${#step}" -le 2 ] && [ "$step" -ge 1 ] && [ "$step" -le 90 ] || \
+    if [ "${#step}" -gt 2 ] || [ "$step" -lt 1 ] || [ "$step" -gt 90 ]; then
       fail '@dwm-step must be an integer from 1 to 90'
+    fi
     case $main_width in
       *%) width=${main_width%\%} ;;
       *)

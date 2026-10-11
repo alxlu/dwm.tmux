@@ -1,0 +1,70 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: ${{ matrix.os }} / tmux ${{ matrix.tmux }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            tmux: system
+          - os: macos-latest
+            tmux: system
+          - os: ubuntu-latest
+            tmux: '3.2'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install Linux dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y tmux shellcheck autoconf automake pkg-config bison libevent-dev libncurses-dev
+      - name: Install macOS dependencies
+        if: runner.os == 'macOS'
+        run: brew install tmux shellcheck
+      - name: Build the minimum supported tmux
+        if: matrix.tmux == '3.2'
+        # Official upstream 3.2 tag, pinned to its full commit identity.
+        env:
+          TMUX_COMMIT: bc4681c83d612a3d9609dd609e7d89b035b25dd5
+        run: |
+          git init -q "$RUNNER_TEMP/tmux-source"
+          cd "$RUNNER_TEMP/tmux-source"
+          git fetch --depth 1 https://github.com/tmux/tmux.git "$TMUX_COMMIT"
+          git checkout --detach FETCH_HEAD
+          test "$(git rev-parse HEAD)" = "$TMUX_COMMIT"
+          sh autogen.sh
+          ./configure --prefix="$RUNNER_TEMP/tmux-3.2"
+          make -j2
+          make install
+          echo "$RUNNER_TEMP/tmux-3.2/bin" >> "$GITHUB_PATH"
+      - name: Verify minimum-version selection
+        if: matrix.tmux == '3.2'
+        run: test "$(tmux -V)" = 'tmux 3.2'
+      - name: Check shell syntax and lint
+        run: |
+          for script in dwm.tmux bin/dwm.tmux tests/integration.sh; do
+            sh -n "$script"
+          done
+          shellcheck -s sh dwm.tmux bin/dwm.tmux tests/integration.sh
+      - name: Run isolated tmux integration tests
+        run: |
+          tmux -V
+          make test
